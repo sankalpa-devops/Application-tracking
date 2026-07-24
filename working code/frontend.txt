@@ -1,0 +1,116 @@
+(updated)
+frontend architecture
+ats_frontend/
+ ├── public/
+ │   └── index.html
+ ├── hooks/
+ │   └── useIdleLogout.js
+ ├── src/
+ ├── components/
+ │   ├── Layout.js
+ │   ├── CandidateTable.js
+ │   ├── CandidateFilters.js
+ │   ├── PipelineBoard.js
+ │   ├── QRCodeModal.js
+ │   ├── CandidateDrawer.js
+ │   └── StatusBadge.js
+ │   ├── pages/
+ │   │   ├── Login.js
+ │   │   ├── HR.js
+ │   │   ├── Admin.js
+ │   │   ├── ResumeScreening.js
+ │   │   ├── BlacklistPage.js
+ │   │   ├── InterviewsPage.js
+ │   │   ├── ForgotPassword.js
+ │   │   ├── ResetPassword.js
+ │   │   ├── WalkInsPage.js
+ │   │   ├── ATSConfig.js   #admin
+ │   │   ├──JobLinkManager.js
+ │   │   ├──PublicJobApply.js
+ │   │   ├── JobManagement.js
+ │   │   └──CandidatesPage.js
+ │   ├── services/
+ │   │   ├── candidateService.js
+ │   │   └── jobLinkService.js
+ ├── App.js
+ ├── index.js
+
+ats_frontend/
+└── src/
+    ├── components/
+    │   └── Layout.js
+    └── pages/
+        ├── Admin.js
+        └── HR.js
+        ├── Admin.js
+        └── Reset.js
+ats_frontend/
+└── src/
+    ├── components/
+    │   └── Layout.js
+    └── pages/
+        ├── HR.js          ← Dashboard (Landing Page)
+        ├── JobManagement.js
+        ├── Admin.js
+        ├── Reset.js
+
+ats_frontend/
+├── src/
+│   ├── pages/
+│   │   ├── JobManagement.js          (UNCHANGED)
+│   │   ├── JobLinkManager.js         ✅ NEW (Admin/HR)
+│   │   └── PublicJobApply.js         ✅ NEW (Chatbot page)
+│   ├── services/
+│   │   └── jobLinkService.js         ✅ NEW
+│   ├── components/
+│   │   └── QRCodeModal.js            ✅ OPTIONAL
+│   └── config/
+│       └── appConfig.js              ✅ NEW
+
+
+ats_frontend/
+ ├── public/
+ │   └── index.html
+ │
+ ├── hooks/
+ │   ├── useIdleLogout.js
+ │   └── useApplicationChatFlow.js
+ │
+ ├── src/
+ │   ├── components/
+ │   │   ├── Layout.js
+ │   │
+ │   │   ├── jobs/
+ │   │   │   ├── JobManagement.js
+ │   │   │   ├── JobRowActions.js
+ │   │   │   └── JobPublicLinkModal.js   ← replaces Walk-in modal
+ │   │
+ │   │   ├── application/
+ │   │   │   ├── ApplicationHeader.js
+ │   │   │   ├── ResumeUploadCard.js
+ │   │   │   ├── ApplicationChatBox.js
+ │   │   │   ├── ChatBubble.js
+ │   │   │   ├── ChatInput.js
+ │   │   │   ├── ApplicationSummary.js
+ │   │   │   └── DuplicateBlockModal.js
+ │   │
+ │   │   ├── candidates/
+ │   │   │   ├── CandidateTable.js
+ │   │   │   ├── CandidateDrawer.js
+ │   │   │   └── StatusBadge.js
+ │   │
+ │   ├── pages/
+ │   │   ├── Login.js
+ │   │   ├── HR.js
+ │   │   ├── Admin.js
+ │   │   ├── JobManagement.js
+ │   │   ├── CandidatesPage.js
+ │   │   └── PublicJobApply.js   ← NEW (replaces WalkinApply)
+ │
+ │   ├── services/
+ │   │   ├── jobService.js
+ │   │   └── applicationService.js
+ │
+ │   ├── App.js
+ │   └── index.js
+

@@ -1,0 +1,234 @@
+Got it — you’re building an **AI-based ATS (Applicant Tracking System)** and this **HR component is the landing/dashboard page** for HR users. Below is a **clean, structured product-level design** covering your **given requirements**, plus **AI-driven features** you should strongly consider.
+👉 **No code included**, only architecture, workflows, and feature definitions.
+
+---
+
+## 1️⃣ Job Profile Creation & Deletion (Core ATS Module)
+
+### 🔹 Job Profile Structure
+
+Each job profile should include:
+
+* **Job Title / Role**
+* **Department**
+* **Job Type** (Full-time / Part-time / Contract / Intern)
+* **Experience Range**
+* **Required Skillsets** (Primary & Secondary)
+* **Location / Remote**
+* **Hiring Manager**
+* **Openings Count**
+* **Status** (Open / Closed / On Hold)
+* **Created Date & Created By**
+
+### 🔹 Functional Capabilities
+
+* Create / Edit / Archive / Delete job profiles
+* Clone existing job profiles
+* Skill tagging (used later for resume matching)
+* Job role versioning (track changes over time)
+
+### 🔹 AI Enhancements (Recommended)
+
+* **Auto skill extraction** from job description
+* **Job description quality score**
+* Skill gap warnings (if JD is unrealistic)
+* Market demand indicator for skills
+
+---
+
+## 2️⃣ Resume Segregation & Intelligent Screening
+
+### 🔹 Resume Intake Sources
+
+* Manual upload (HR)
+* Candidate portal
+* Walk-in QR link
+* Email parsing
+* Job portals (future integration)
+
+### 🔹 Resume Processing Pipeline
+
+1. Resume upload
+2. Resume parsing (PDF/DOC/Image OCR)
+3. Data normalization
+4. Skill extraction
+5. Job matching
+
+### 🔹 Resume Segregation Logic
+
+* **Matched Candidates**
+* **Partially Matched**
+* **Not Eligible**
+* **Duplicate Profiles**
+* **Blacklisted Matches**
+
+### 🔹 AI-Based Resume Matching
+
+* Skill similarity score
+* Experience relevance score
+* Role suitability score
+* Overall **Fit Score (%)**
+
+### 🔹 Advanced AI Features
+
+* Semantic matching (not keyword-only)
+* Contextual skill mapping (e.g., React ≈ Frontend)
+* Resume freshness scoring
+* AI-generated candidate summary
+
+---
+
+## 3️⃣ Blacklisted Candidate Identification
+
+### 🔹 Blacklist Data Points
+
+* Email
+* Phone number
+* Aadhaar / PAN (hashed)
+* Previous employee ID
+* Face match (optional future scope)
+* Reason for blacklisting
+* Blacklist expiry (optional)
+
+### 🔹 Detection Flow
+
+* On resume upload → auto scan
+* On manual candidate creation → real-time check
+* On walk-in entry → instant alert
+
+### 🔹 AI Enhancements
+
+* Duplicate identity detection
+* Alias name detection
+* Email/phone pattern analysis
+* Risk scoring system
+
+### 🔹 HR Dashboard Behavior
+
+* Highlight blacklisted candidates in **RED**
+* Show reason + history
+* Restrict progression unless overridden
+
+---
+
+## 4️⃣ Walk-in URL Creation + QR Code Access
+
+### 🔹 Walk-in Job Link Features
+
+* Unique URL per job
+* Auto-expire links
+* IP / device tracking
+* Location capture (optional)
+
+### 🔹 Candidate Walk-in Flow
+
+1. Scan QR code
+2. Open job-specific application form
+3. Upload resume
+4. Auto ATS processing
+5. Candidate enters same pipeline as others
+
+### 🔹 AI Enhancements
+
+* Fraud detection (multiple attempts from same device)
+* Smart form auto-fill from resume
+* Language auto-translation
+* Chatbot assistance for walk-ins
+
+---
+
+## 5️⃣ Analytics Dashboard (Main HR Landing Page)
+
+### 🔹 Key Metrics to Show
+
+* Total open jobs
+* Total applicants
+* Shortlisted vs rejected
+* Walk-in vs online applicants
+* Time-to-hire
+* Skill demand heatmap
+* Source effectiveness
+
+### 🔹 Visual Components
+
+* Line charts (applications over time)
+* Funnel view (Applied → Hired)
+* Pie charts (source distribution)
+* Skill gap analytics
+* Department-wise hiring
+
+### 🔹 AI-Driven Insights
+
+* Hiring bottleneck detection
+* Job role performance score
+* Skill availability forecast
+* Attrition risk insights
+* Hiring success prediction
+
+---
+
+## ⭐ Best AI-Based ATS Features (Highly Recommended)
+
+### 🧠 Smart Candidate Ranking
+
+* Rank candidates per job dynamically
+* Auto update scores when job requirements change
+
+### 🗣 AI Interview Assistance
+
+* AI-generated interview questions
+* Skill-based question suggestions
+* Interview feedback summarization
+
+### 🤖 HR Copilot
+
+* “Why are candidates getting rejected?”
+* “Best candidate for React role?”
+* “Show top 5 resumes for today’s walk-ins”
+
+### 🔍 Bias Reduction
+
+* Blind resume screening
+* Fairness scoring
+* Diversity analytics
+
+### 📄 Compliance & Audit
+
+* Hiring decision traceability
+* GDPR / data retention rules
+* Audit logs
+
+---
+
+## 🧩 Suggested HR Dashboard Sections (UI-Level)
+
+* **Overview**
+* **Jobs**
+* **Candidates**
+* **Walk-ins**
+* **Blacklist**
+* **Analytics**
+* **AI Insights**
+* **Settings**
+
+---
+
+## 🚀 Future-Ready Enhancements
+
+* Video resume analysis
+* Face recognition for walk-ins
+* Offer letter automation
+* Background verification integration
+* Payroll & HRMS sync
+
+---
+
+If you want, next I can help you with:
+
+* **Database schema (ATS-ready)**
+* **AI architecture (LLM + resume parser + vector DB)**
+* **User roles & permissions**
+* **HR dashboard UX wireframe**
+* **Interview workflow design**
+
+Just tell me what you want to design next.

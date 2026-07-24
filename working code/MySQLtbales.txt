@@ -1,0 +1,90 @@
+CREATE DATABASE ATS_Sys;
+
+USE ATS_Sys;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('HR','ADMIN') NOT NULL,
+    email VARCHAR(100),
+    reset_token VARCHAR(255),
+    reset_expiry DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE users
+ADD COLUMN user_name VARCHAR(100) NOT NULL AFTER emp_id;
+
+update users
+set user_name = 'Sharath Kumar'
+where emp_id = 'NEB00895';
+
+
+SELECT * FROM users WHERE email='sharath.kumar@laxmigroup.net.in'
+
+INSERT INTO users (emp_id, password, role, email)
+VALUES (
+  'NEB00895',
+  'temp',
+  'ADMIN',
+  'sharath.kumar@laxmigroup.net.in'
+);
+
+SELECT emp_id, password FROM users WHERE emp_id = 'NEB00895';
+
+
+select * from users;
+USE ATS_Sys;
+CREATE TABLE jobs (
+    id VARCHAR(36) PRIMARY KEY,
+    title VARCHAR(200),
+    department VARCHAR(200),
+    type VARCHAR(50),
+    experience VARCHAR(100),
+    skills TEXT,
+    location VARCHAR(200),
+    manager VARCHAR(200),
+    openings INT,
+    status VARCHAR(50),
+    job_description TEXT,
+    created_by VARCHAR(150),
+    created_date DATE,
+    version INT
+);
+
+select * from jobs
+
+CREATE TABLE candidates (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(200),
+    email VARCHAR(200),
+    phone VARCHAR(20),
+
+    pan VARCHAR(20) UNIQUE,
+    aadhaar VARCHAR(20) UNIQUE,
+    uan VARCHAR(20) UNIQUE,
+
+    referred_by VARCHAR(100),
+
+    resume_path TEXT,
+    extracted_skills TEXT,
+
+    experience VARCHAR(100),
+    job_match_id VARCHAR(36),
+
+    status VARCHAR(50) DEFAULT 'Applied',
+    fit_score INT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE job_apply_links (
+    id VARCHAR(36) PRIMARY KEY,
+    job_id VARCHAR(36),
+    slug VARCHAR(150) UNIQUE,
+    expires_at DATETIME,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);

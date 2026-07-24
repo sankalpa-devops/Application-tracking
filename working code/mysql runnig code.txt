@@ -1,0 +1,105 @@
+CREATE TABLE candidates (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(200),
+    email VARCHAR(200),
+    phone VARCHAR(20),
+
+    pan VARCHAR(20) UNIQUE,
+    aadhaar VARCHAR(20) UNIQUE,
+    uan VARCHAR(20) UNIQUE,
+	referral_type VARCHAR(20),
+    referred_by VARCHAR(100),
+    referral_value VARCHAR(100),
+    resume_path TEXT,
+    extracted_skills TEXT,
+
+    experience VARCHAR(100),
+    job_match_id VARCHAR(36) UNIQUE,
+
+    status VARCHAR(50) DEFAULT 'Applied',
+    fit_score INT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+select * from candidates
+
+USE ATS_Sys;
+CREATE TABLE job_apply_links (
+    id VARCHAR(36) PRIMARY KEY,
+    job_id VARCHAR(36),
+    slug VARCHAR(150) UNIQUE,
+    expires_at DATETIME,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);
+
+select * from job_apply_links;
+select * from jobs ;
+select * from users;
+select * from candidates;
+select * from candidate_ml_data;
+truncate table job_apply_links;
+USE ATS_Sys;
+truncate table candidates
+
+
+ALTER TABLE job_apply_links 
+MODIFY slug VARCHAR(255) NOT NULL UNIQUE;
+s
+
+ALTER TABLE candidates
+ADD referral_type VARCHAR(20),   -- 'EMPLOYEE','MOBILE','AGENCY'
+ADD referral_value VARCHAR(100);
+
+
+CREATE TABLE candidate_ml_data (
+    id VARCHAR(36) PRIMARY KEY,
+    candidate_id VARCHAR(36),
+    job_id VARCHAR(36),
+
+    extracted_text LONGTEXT,
+    extracted_skills TEXT,
+    matched_skills TEXT,
+
+    ats_score INT,
+    experience_years FLOAT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (candidate_id) REFERENCES candidates(id),
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);
+
+ALTER TABLE candidates
+ADD notice_period VARCHAR(50),
+ADD current_ctc DECIMAL(6,2),
+ADD expected_ctc DECIMAL(6,2);
+
+ALTER TABLE candidates
+ADD COLUMN current_location VARCHAR(200) NOT NULL AFTER uan,
+ADD COLUMN willing_to_relocate VARCHAR(10) NOT NULL AFTER current_location;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE candidate_ml_data;
+TRUNCATE TABLE candidates;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+SELECT
+  c.name,
+  j.title,
+  c.experience,
+  m.ats_score,
+  m.extracted_skills,
+  c.status
+FROM candidates c
+LEFT JOIN jobs j ON c.job_match_id = j.id
+LEFT JOIN candidate_ml_data m
+  ON c.id = m.candidate_id
+ AND c.job_match_id = m.job_id;  
+ 
+ ALTER TABLE candidates
+ADD COLUMN status_updated_at DATETIME NULL;

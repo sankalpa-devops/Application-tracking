@@ -1,0 +1,7 @@
+.venv/ 
+backup/ 
+my-app/ 
+"working code/" 
+env.txt 
+ats_backend/.env 
+.env 

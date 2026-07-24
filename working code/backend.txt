@@ -1,0 +1,169 @@
+ats_backend/
+ ├── app/
+ │   ├── auth/
+ │   ├── models/
+ │   ├── routes/
+ │   ├── services/
+ │   ├── ai/
+ │   └── main.py
+ ├── venv/
+ └── .env
+
+ats_backend/
+ ├── main.py
+ ├──ai
+ ├──.env
+ ├──main.py
+ ├──auth/
+ │  └──auth.py
+ └── app/
+     ├── __init__.py
+     ├── db.py
+     ├── security.py
+     ├── validator.py
+     ├── email_service.py
+     ├── routes/
+     │    ├── __init__.py
+     │    ├── auth.py
+     │    └── jobs.py
+     └── models/
+          ├── __init__.py
+          └── models.py
+app/
+ ├── db.py
+ ├── security.py   ✅
+ ├── validator.py  ✅
+ ├── email_service.py ✅
+ ├── models/
+ │    └── models.py
+ ├── routes/
+ │    └── auth.py
+
+ats_backend/
+├── main.py
+├── .env
+├── installer.py
+├── assets
+├── app/
+│   ├── ai/
+│   └── resume_parser.py
+│   ├── utils/
+│   └── calendar.py
+│   ├── db.py
+│   ├── security.py
+│   ├── validator.py
+│   ├── email_service.py
+│   ├── models/
+│   │   └── models.py
+│   ├── routes/
+│   │   ├── auth.py
+│   │   ├── ats_config.py
+│   │   ├── candidates.py
+│   │   ├── interviews.py
+│   │   ├── walkin.py
+│   │   ├── blacklist.py
+│   │   ├── offers.py
+│   │   ├── candidate_status.py
+│   │   ├── jobs.py
+│   │   ├── resume_screening.py                   
+│   │   ├── job_links.py           
+│   │   └── public_apply.py        ✅ NEW (chatbot)
+│   └── schemas/
+│   │   ├── job_link.py           
+│   │   └── candidate.py   
+│   └── services/  
+│   │   ├── candidateService.js
+│   │   └── auto_screening.py      
+
+
+Sharath#008
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+J5EHXXdeNpK9KfX3O5nCma6rRaLaA52g3rWZSernkb0=
+
+
+
+(venv) PS D:\ATS\ATS-automated-System\ats_backend> uvicorn main:app --reload
+>> 
+INFO:     Will watch for changes in these directories: ['D:\\ATS\\ATS-automated-System\\ats_backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [2752] using StatReload
+ERROR:    Error loading ASGI app. Could not import module "main".
+INFO:     Stopping reloader process [2752]
+for the procided solution above getting this error and page like app.security.validator,app.security.email_service,app.security.security not created and suggest app.auth.auth code as well and path ats_backend\app\main.py for main.py
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        12-02-2026     10:56                app
+d-----        12-02-2026     09:49                POST
+d-----        12-02-2026     09:35                venv
+-a----        12-02-2026     10:23            319 .env
+-a----        12-02-2026     10:56            210 main.py
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        12-02-2026     09:44                ai
+d-----        12-02-2026     10:46                auth
+d-----        12-02-2026     10:33                models
+d-----        12-02-2026     10:47                routes
+d-----        12-02-2026     09:44                services
+d-----        12-02-2026     10:40                __pycache__
+-a----        12-02-2026     10:24            338 db.py
+
+ats_backend\app\models\models.py
+
+(venv) PS D:\ATS\ATS-automated-System\ats_frontend> dir
+
+
+    Directory: D:\ATS\ATS-automated-System\ats_frontend
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        12-02-2026     09:58                node_modules
+d-----        12-02-2026     09:38                public
+d-----        12-02-2026     09:40                src
+-a----        12-02-2026     09:38            310 .gitignore
+-a----        12-02-2026     09:58         656814 package-lock.json
+-a----        12-02-2026     09:47           1000 package.json
+-a----        12-02-2026     09:38           3359 README.md
+
+(venv) PS D:\ATS\ATS-automated-System\ats_frontend\src> dir
+
+
+    Directory: D:\ATS\ATS-automated-System\ats_frontend\src
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        12-02-2026     09:40                components
+d-----        12-02-2026     10:09                pages
+d-----        12-02-2026     09:40                services
+-a----        12-02-2026     09:38            564 App.css
+-a----        12-02-2026     12:26            598 App.js
+-a----        12-02-2026     09:38            246 App.test.js
+-a----        12-02-2026     09:38            366 index.css
+-a----        12-02-2026     15:18            237 index.js
+-a----        12-02-2026     09:38           2632 logo.svg
+-a----        12-02-2026     09:38            362 reportWebVitals.js
+-a----        12-02-2026     09:38            241 setupTests.js
+
+
+(venv) PS D:\ATS\ATS-automated-System\ats_frontend\src\pages> dir
+
+
+    Directory: D:\ATS\ATS-automated-System\ats_frontend\src\pages
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        12-02-2026     09:46              0 Admin.js
+-a----        12-02-2026     10:08           1502 ForgotPassword.js
+-a----        12-02-2026     09:45              0 HR.js
+-a----        12-02-2026     10:14           2487 Login.js
+-a----        12-02-2026     09:46              0 Reset.js
+-a----        12-02-2026     16:35           2075 ResetPassword.js
+
+
+(venv) PS D:\ATS\ATS-automated-System\ats_frontend\src\pages> 
+

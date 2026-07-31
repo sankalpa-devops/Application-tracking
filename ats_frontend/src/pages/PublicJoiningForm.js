@@ -270,7 +270,7 @@ const PublicJoiningForm = () => {
                 <div className="mt-2">
                   <img
                     src={additionalData.photo_base64}
-                    alt="Passport Photo Preview"
+                    alt="Passport Preview"
                     style={{
                       width: "120px",
                       height: "150px",

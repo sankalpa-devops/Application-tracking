@@ -18,11 +18,10 @@ import SubmittedJoiningFormsPage from "./SubmittedJoiningFormsPage";
 
 const HR = ({ currentUser, onLogout }) => {
   const [activePage, setActivePage] = useState("Dashboard");
-  const [hrServiceEnabled, setHrServiceEnabled] = useState(true);
   const [blockedFeatures, setBlockedFeatures] = useState({});
   const [checkingService, setCheckingService] = useState(true);
 
-  // ✅ Check HR Service Status and Blocked Features on Mount
+  // ✅ Check Blocked Features on Mount
   useEffect(() => {
     const initHRConfig = async () => {
       const token = localStorage.getItem("token");
@@ -30,16 +29,7 @@ const HR = ({ currentUser, onLogout }) => {
       const API_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
       
       try {
-        const [resService, resBlocks] = await Promise.all([
-          fetch(`${API_URL}/ats-config/global/hr-service`, { headers }),
-          fetch(`${API_URL}/ats-config/global/blocked-features`, { headers })
-        ]);
-        
-        const dataService = await resService.json();
-        if (dataService && dataService.hr_service_enabled !== undefined) {
-          setHrServiceEnabled(dataService.hr_service_enabled);
-        }
-        
+        const resBlocks = await fetch(`${API_URL}/ats-config/global/blocked-features`, { headers });
         const dataBlocks = await resBlocks.json();
         if (dataBlocks) {
           setBlockedFeatures(dataBlocks);

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { sendLOI } from "../services/offerService";
 
-const CandidateDrawer = ({ candidate, onClose, refreshData }) => {
+const CandidateDrawer = ({ candidate, onClose, refreshData, hrServiceEnabled }) => {
   const [loiForm, setLoiForm] = useState({
     ctc: "",
     benefits: "",
@@ -67,16 +67,68 @@ const CandidateDrawer = ({ candidate, onClose, refreshData }) => {
 
       <h4>Skills</h4>
       <ul>
-        {candidate.skills && candidate.skills.split(",").map((s, i) => (
-          <li key={i}>{s.trim()}</li>
-        ))}
+        {candidate.skills &&
+          (Array.isArray(candidate.skills)
+            ? candidate.skills
+            : typeof candidate.skills === "string"
+            ? candidate.skills.split(",")
+            : []
+          ).map((s, i) => (
+            <li key={i}>{String(s).trim()}</li>
+          ))}
       </ul>
 
       <h4>AI Summary</h4>
-      <p>
-        Strong match for the role based on skill alignment and experience.
-        Suitable for next interview round.
-      </p>
+      {!hrServiceEnabled ? (
+        <div style={{ marginTop: "12px", padding: "12px", borderRadius: "6px", backgroundColor: "#fee2e2", borderLeft: "4px solid #dc3545", color: "#991b1b" }}>
+          <strong>AI Screening Suspended</strong>
+          <div style={{ fontSize: "13px", marginTop: "4px", color: "#7f1d1d" }}>
+            The AI match analysis and recommendation engine is currently turned off by the system administrator.
+          </div>
+        </div>
+      ) : (() => {
+        const { summary, recommendation, recommendationColor } = (() => {
+          const score = candidate.fitScore || 0;
+          const skillsList = Array.isArray(candidate.skills)
+            ? candidate.skills
+            : typeof candidate.skills === "string"
+            ? candidate.skills.split(",")
+            : [];
+          const expText = candidate.experience ? String(candidate.experience).trim() : "";
+
+          let sum = "";
+          let rec = "";
+          let color = "";
+
+          if (score >= 75) {
+            sum = `Excellent candidate with a high match score of ${score}%. They possess key required skills such as ${skillsList.slice(0, 3).map(s => String(s).trim()).join(", ") || "essential technologies"}. ${expText ? `Their experience background (${expText}) aligns very well with the position requirements.` : "Their professional background strongly fits the role."}`;
+            rec = "ACCEPT (Proceed to Interview)";
+            color = "#198754"; // Bootstrap Success Green
+          } else if (score >= 50) {
+            sum = `Moderate candidate matching ${score}% of the job requirements. They have experience/skills in ${skillsList.slice(0, 2).map(s => String(s).trim()).join(", ") || "some key areas"} but may need further screening to verify fit. ${expText ? `Their profile lists ${expText} of experience.` : ""}`;
+            rec = "POTENTIAL MATCH (Screening Recommended)";
+            color = "#fd7e14"; // Bootstrap Warning Orange
+          } else {
+            sum = `Low alignment with the role (match score of ${score}%). The candidate's listed skills (${skillsList.slice(0, 2).map(s => String(s).trim()).join(", ") || "none"}) and profile do not meet the core technical threshold for this position.`;
+            rec = "REJECT";
+            color = "#dc3545"; // Bootstrap Danger Red
+          }
+
+          return { summary: sum, recommendation: rec, recommendationColor: color };
+        })();
+
+        return (
+          <div>
+            <p>{summary}</p>
+            <div style={{ marginTop: "12px", padding: "10px", borderRadius: "6px", backgroundColor: "#f8f9fa", borderLeft: `4px solid ${recommendationColor}` }}>
+              <strong>AI Recommendation: </strong>
+              <span style={{ color: recommendationColor, fontWeight: "bold" }}>
+                {recommendation}
+              </span>
+            </div>
+          </div>
+        );
+      })()}
 
       <div style={{ marginTop: "24px", borderTop: "1px solid #e5e7eb", paddingTop: "16px" }}>
         {!showLoiForm ? (

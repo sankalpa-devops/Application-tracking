@@ -131,6 +131,19 @@ def submit_application(
     if existing:
         raise HTTPException(status_code=400, detail="You already applied for this job")
 
+    # ✅ check unique constraints to prevent DB IntegrityErrors
+    existing_pan = db.query(Candidate).filter(Candidate.pan == pan).first()
+    if existing_pan:
+        raise HTTPException(status_code=400, detail="A candidate with this PAN already exists in the system")
+
+    existing_aadhaar = db.query(Candidate).filter(Candidate.aadhaar == aadhaar).first()
+    if existing_aadhaar:
+        raise HTTPException(status_code=400, detail="A candidate with this Aadhaar already exists in the system")
+
+    existing_uan = db.query(Candidate).filter(Candidate.uan == uan).first()
+    if existing_uan:
+        raise HTTPException(status_code=400, detail="A candidate with this UAN already exists in the system")
+
 
     # normalize referral fields
     if not referral_type:
@@ -153,6 +166,33 @@ def submit_application(
         resume_path = os.path.join(UPLOAD_DIR, filename)
         with open(resume_path, "wb") as buffer:
             shutil.copyfileobj(resume.file, buffer)
+
+        # ✅ Check if candidate name exists inside the resume text
+        from app.ai.resume_parser import extract_text
+        resume_text = extract_text(resume_path)
+        
+        name_clean = name.strip().lower()
+        name_tokens = [t for t in name_clean.split() if len(t) > 2]
+        
+        is_name_matched = False
+        if not resume_text.strip():
+            is_name_matched = True  # Bypass check for unextractable text/scanned documents
+        elif name_clean in resume_text:
+            is_name_matched = True
+        elif name_tokens:
+            first_name = name_tokens[0]
+            if first_name in resume_text:
+                is_name_matched = True
+                
+        if not is_name_matched:
+            try:
+                os.remove(resume_path)
+            except:
+                pass
+            raise HTTPException(
+                status_code=400,
+                detail="The name on the resume does not match the candidate's name. Please upload a valid resume."
+            )
 
 
     # create candidate

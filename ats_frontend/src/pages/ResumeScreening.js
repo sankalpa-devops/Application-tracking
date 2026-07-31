@@ -255,7 +255,7 @@ const ResumeScreening = () => {
                 <td>
                   {c.resume_path && (
                     <a
-                      href={c.resume_path}
+                      href={`${API_BASE.replace("/api", "")}${c.resume_path}`}
                       target="_blank"
                       rel="noreferrer"
                     >

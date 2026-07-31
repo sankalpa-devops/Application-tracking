@@ -71,6 +71,41 @@ class JobApplyLink(Base):
 
 
 # =========================================================
+# JOINING FORM LINKS
+# =========================================================
+class JoiningFormLink(Base):
+    __tablename__ = "joining_form_links"
+
+    id = Column(String(36), primary_key=True)
+    candidate_id = Column(String(36), ForeignKey("candidates.id"), nullable=False)
+    slug = Column(String(225), unique=True, nullable=False)
+    title = Column(String(200))
+    expires_at = Column(DateTime)
+    is_active = Column(Boolean, server_default=text("1"), nullable=False)
+    created_by = Column(String(100))
+    created_at = Column(DateTime, server_default=func.now())
+
+
+# =========================================================
+# JOINING FORMS
+# =========================================================
+class JoiningForm(Base):
+    __tablename__ = "joining_forms"
+
+    id = Column(String(36), primary_key=True)
+    link_id = Column(String(36), ForeignKey("joining_form_links.id"), nullable=False)
+    candidate_id = Column(String(36), ForeignKey("candidates.id"), nullable=False)
+
+    employee_id = Column(String(50), unique=True, nullable=False)
+    edit_token = Column(String(225), unique=True, nullable=False)
+    additional_data = Column(JSON)
+
+    status = Column(String(50), server_default="Submitted")
+    submitted_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime)
+
+
+# =========================================================
 # EMPLOYEE TRANSFER REQUEST LINKS
 # =========================================================
 class TransferRequestLink(Base):

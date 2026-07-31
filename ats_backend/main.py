@@ -82,6 +82,7 @@ from app.routes.admin import router as admin_router
 from app.routes.transfer_requests import router as transfer_requests_router
 from app.routes.ats_config import router as ats_config_router
 from app.routes.letterhead_templates import router as letterhead_templates_router
+from app.routes.joining_forms import router as joining_forms_router
 
 app = FastAPI()
 
@@ -117,6 +118,7 @@ app.include_router(admin_router, prefix="/api")
 app.include_router(transfer_requests_router, prefix="/api")
 app.include_router(ats_config_router, prefix="/api")
 app.include_router(letterhead_templates_router, prefix="/api")
+app.include_router(joining_forms_router, prefix="/api")
 
 
 @app.get("/")

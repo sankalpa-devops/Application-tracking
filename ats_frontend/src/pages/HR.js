@@ -13,9 +13,45 @@ import RejectedTransferRequestsPage from "./RejectedTransferRequestsPage";
 import ResumeScreening from "./ResumeScreening";
 import TransferRequestsPage from "./TransferRequestsPage";
 import WalkInsPage from "./WalkInsPage";
+import JoiningFormsPage from "./JoiningFormsPage";
+import SubmittedJoiningFormsPage from "./SubmittedJoiningFormsPage";
 
 const HR = ({ currentUser, onLogout }) => {
   const [activePage, setActivePage] = useState("Dashboard");
+  const [hrServiceEnabled, setHrServiceEnabled] = useState(true);
+  const [blockedFeatures, setBlockedFeatures] = useState({});
+  const [checkingService, setCheckingService] = useState(true);
+
+  // ✅ Check HR Service Status and Blocked Features on Mount
+  useEffect(() => {
+    const initHRConfig = async () => {
+      const token = localStorage.getItem("token");
+      const headers = { "Authorization": `Bearer ${token}` };
+      const API_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
+      
+      try {
+        const [resService, resBlocks] = await Promise.all([
+          fetch(`${API_URL}/ats-config/global/hr-service`, { headers }),
+          fetch(`${API_URL}/ats-config/global/blocked-features`, { headers })
+        ]);
+        
+        const dataService = await resService.json();
+        if (dataService && dataService.hr_service_enabled !== undefined) {
+          setHrServiceEnabled(dataService.hr_service_enabled);
+        }
+        
+        const dataBlocks = await resBlocks.json();
+        if (dataBlocks) {
+          setBlockedFeatures(dataBlocks);
+        }
+      } catch (err) {
+        console.error("Error loading HR service configuration:", err);
+      } finally {
+        setCheckingService(false);
+      }
+    };
+    initHRConfig();
+  }, []);
 
   // ✅ Dashboard State
   const [dashboardData, setDashboardData] = useState({
@@ -37,8 +73,10 @@ const HR = ({ currentUser, onLogout }) => {
       }
     };
 
-    fetchDashboard();
-  }, []);
+    if (activePage === "Dashboard") {
+      fetchDashboard();
+    }
+  }, [activePage]);
 
   // Sidebar Items
   const sidebarItems = [
@@ -49,6 +87,8 @@ const HR = ({ currentUser, onLogout }) => {
     { icon: "📄", label: "Resume Screening", onClick: () => setActivePage("Resume Screening") },
     { icon: "🚶‍♂️", label: "Walk-ins", onClick: () => setActivePage("Walk-ins") },
     { icon: "🎤", label: "Interviews", onClick: () => setActivePage("Interviews") },
+    { icon: "📝", label: "Joining Forms", onClick: () => setActivePage("Joining Forms") },
+    { icon: "📁", label: "Submitted Forms", onClick: () => setActivePage("Submitted Forms") },
     { icon: "⛔", label: "Blacklist", onClick: () => setActivePage("Blacklist") },
     { icon: "📊", label: "Analytics", onClick: () => setActivePage("Analytics") },
     { icon: "↩️", label: "Rejected", onClick: () => setActivePage("Rejected") },
@@ -57,13 +97,30 @@ const HR = ({ currentUser, onLogout }) => {
     { icon: "⚙️", label: "Settings", onClick: () => setActivePage("Settings") }
   ];
 
+  const renderBlockedScreen = (featureName) => (
+    <div className="card p-5 text-center" style={{ borderLeft: "4px solid #dc3545", maxWidth: "600px", margin: "40px auto" }}>
+      <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+      <h4 style={{ color: "#dc3545" }}>{featureName} Service Suspended</h4>
+      <p className="text-muted mt-2">
+        This specific feature has been temporarily suspended by the system Administrator.
+      </p>
+      <p className="text-muted small">
+        Please contact system administration if you require access to this tool.
+      </p>
+    </div>
+  );
+
   const renderContent = () => {
+    if (blockedFeatures[activePage]) {
+      return renderBlockedScreen(activePage);
+    }
+
     switch (activePage) {
       case "Job Management":
         return <JobManagement currentUser={currentUser} onLogout={onLogout} />;
 
       case "Candidates":
-        return <CandidatePage currentUser={currentUser} onLogout={onLogout} />;
+        return <CandidatePage currentUser={currentUser} onLogout={onLogout} hrServiceEnabled={!blockedFeatures["Resume Screening"]} />;
 
       case "Job Links":
         return <JobLinkManager currentUser={currentUser} onLogout={onLogout} />;
@@ -79,6 +136,12 @@ const HR = ({ currentUser, onLogout }) => {
 
       case "Interviews":
         return <InterviewsPage currentUser={currentUser} onLogout={onLogout} />;
+
+      case "Joining Forms":
+        return <JoiningFormsPage currentUser={currentUser} onLogout={onLogout} />;
+
+      case "Submitted Forms":
+        return <SubmittedJoiningFormsPage currentUser={currentUser} onLogout={onLogout} />;
 
       case "Transfer Requests":
         return <TransferRequestsPage currentUser={currentUser} />;
@@ -208,6 +271,16 @@ const HR = ({ currentUser, onLogout }) => {
       </div>
     </div>
   );
+
+  if (checkingService) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Layout

@@ -35,4 +35,4 @@ class CandidateResponse(BaseModel):
     willing_to_relocate: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -606,11 +606,6 @@
 //         </form>
 //       </div>
 //     </div>
-//   );
-// };
-
-// export default PublicJobApplyForm;
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
@@ -628,7 +623,8 @@ const PublicJobApplyForm = () => {
   const [loading, setLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false); // ✅ NEW
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showReferralModal, setShowReferralModal] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -658,6 +654,7 @@ const PublicJobApplyForm = () => {
       try {
         const res = await axios.get(`${API}/apply/${slug}`);
         setJobId(res.data.job_id);
+        setShowReferralModal(true);
       } catch (err) {
         setError(err.response?.data?.detail || "Invalid application link");
       } finally {
@@ -752,6 +749,98 @@ const PublicJobApplyForm = () => {
 
   return (
     <div className="container py-5">
+      {showReferralModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <div style={styles.modalHeader}>
+              <h5 style={{ margin: 0 }}>Referral Information</h5>
+              <button type="button" onClick={() => setShowReferralModal(false)} style={styles.closeBtn}>✖</button>
+            </div>
+            <div className="modal-body py-2">
+              <p className="text-muted" style={{ fontSize: "14px" }}>Were you referred by an employee, consultant, or vendor for this role?</p>
+              
+              <div className="mb-3">
+                <select
+                  className="form-select"
+                  value={form.is_referred}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setForm((prev) => ({
+                      ...prev,
+                      is_referred: val,
+                      ...(val === "no" ? { referral_type: "", referred_by: "", referral_value: "" } : {}),
+                    }));
+                  }}
+                >
+                  <option value="">Select Option</option>
+                  <option value="yes">Yes, I was referred</option>
+                  <option value="no">No, I was not referred</option>
+                </select>
+              </div>
+
+              {form.is_referred === "yes" && (
+                <>
+                  <div className="mb-3">
+                    <label className="form-label" style={{ fontSize: "13px" }}>Referral Type</label>
+                    <select
+                      className="form-select"
+                      name="referral_type"
+                      value={form.referral_type}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Referral Type</option>
+                      <option value="Employee">Employee</option>
+                      <option value="Consultant">Consultant</option>
+                      <option value="Vendor">Vendor</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label" style={{ fontSize: "13px" }}>Referred By (Name)</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter referrer name"
+                      name="referred_by"
+                      value={form.referred_by}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label" style={{ fontSize: "13px" }}>Employee ID / Contact Number</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter employee ID or contact info"
+                      name="referral_value"
+                      value={form.referral_value}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+            <div style={styles.modalFooter}>
+              <button
+                type="button"
+                className="btn btn-primary w-100"
+                onClick={() => {
+                  if (form.is_referred === "yes" && (!form.referral_type || !form.referred_by || !form.referral_value)) {
+                    alert("Please fill in all referral details or select 'No'.");
+                    return;
+                  }
+                  setShowReferralModal(false);
+                }}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="card shadow-lg p-4 mx-auto" style={{ maxWidth: 720 }}>
         <h3 className="mb-4 text-center">Job Application</h3>
 
@@ -762,8 +851,10 @@ const PublicJobApplyForm = () => {
 
           <input className="form-control mb-3" placeholder="Current Company" name="current_company" required onChange={handleChange} disabled={isSubmitted} />
 
-          {/* ✅ FIXED DOB */}
-          <input className="form-control mb-3" type="date" name="dob" required onChange={handleChange} disabled={isSubmitted} />
+          <div className="mb-3">
+            <label className="form-label text-muted mb-1" style={{ fontSize: "14px", fontWeight: "bold" }}>Date of Birth (Required)</label>
+            <input className="form-control" type="date" name="dob" placeholder="Enter Date of Birth" required onChange={handleChange} disabled={isSubmitted} />
+          </div>
 
           <input className="form-control mb-3" placeholder="PAN" name="pan" required onChange={handleChange} disabled={isSubmitted} />
           <input className="form-control mb-3" placeholder="Aadhaar" name="aadhaar" required onChange={handleChange} disabled={isSubmitted} />
@@ -783,6 +874,55 @@ const PublicJobApplyForm = () => {
             <option value="No">No</option>
           </select>
 
+          <div className="card p-3 mb-3 bg-light border-0">
+            <h6 style={{ fontWeight: "bold" }}>Referral Information</h6>
+            <div className="form-check form-check-inline mb-2">
+              <input
+                className="form-check-input"
+                type="radio"
+                name="is_referred"
+                id="referredYes"
+                value="yes"
+                checked={form.is_referred === "yes"}
+                onChange={(e) => setForm(prev => ({ ...prev, is_referred: "yes" }))}
+                disabled={isSubmitted}
+              />
+              <label className="form-check-label" htmlFor="referredYes" style={{ cursor: "pointer" }}>Referred by employee?</label>
+            </div>
+            <div className="form-check form-check-inline mb-2 ms-3">
+              <input
+                className="form-check-input"
+                type="radio"
+                name="is_referred"
+                id="referredNo"
+                value="no"
+                checked={form.is_referred === "no" || !form.is_referred}
+                onChange={(e) => setForm(prev => ({ ...prev, is_referred: "no", referral_type: "", referred_by: "", referral_value: "" }))}
+                disabled={isSubmitted}
+              />
+              <label className="form-check-label" htmlFor="referredNo" style={{ cursor: "pointer" }}>No referral</label>
+            </div>
+
+            {form.is_referred === "yes" && (
+              <div className="row g-2 mt-1">
+                <div className="col-md-4">
+                  <select className="form-select" name="referral_type" required onChange={handleChange} value={form.referral_type} disabled={isSubmitted}>
+                    <option value="">Referral Type</option>
+                    <option value="Employee">Employee</option>
+                    <option value="Consultant">Consultant</option>
+                    <option value="Vendor">Vendor</option>
+                  </select>
+                </div>
+                <div className="col-md-4">
+                  <input className="form-control" placeholder="Referred By Name" name="referred_by" required onChange={handleChange} value={form.referred_by} disabled={isSubmitted} />
+                </div>
+                <div className="col-md-4">
+                  <input className="form-control" placeholder="Emp ID / Mobile" name="referral_value" required onChange={handleChange} value={form.referral_value} disabled={isSubmitted} />
+                </div>
+              </div>
+            )}
+          </div>
+
           <input className="form-control mb-3" type="file" accept=".pdf,.doc,.docx" required onChange={handleFileChange} disabled={isSubmitted} />
 
           {uploadProgress > 0 && (
@@ -800,6 +940,51 @@ const PublicJobApplyForm = () => {
       </div>
     </div>
   );
+};
+
+const styles = {
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2000,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: "24px",
+    borderRadius: "8px",
+    maxWidth: "500px",
+    width: "90%",
+    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+  },
+  modalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottom: "1px solid #e5e7eb",
+    paddingBottom: "12px",
+    marginBottom: "16px",
+  },
+  closeBtn: {
+    border: "none",
+    background: "none",
+    fontSize: "18px",
+    cursor: "pointer",
+  },
+  modalFooter: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "12px",
+    borderTop: "1px solid #e5e7eb",
+    paddingTop: "12px",
+    marginTop: "16px",
+  },
 };
 
 export default PublicJobApplyForm;

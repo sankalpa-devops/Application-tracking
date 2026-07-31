@@ -290,3 +290,93 @@ def get_recent_activity(
         }
         for row in rows
     ]
+
+
+@router.get("/candidates")
+def admin_get_candidates(
+    current_admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        from app.routes.candidates import cleanup_expired_rejected_candidates
+        cleanup_expired_rejected_candidates(db)
+    except Exception as e:
+        print(f"Error during admin candidate cleanup: {e}")
+
+    rows = (
+        db.query(
+            Candidate.id,
+            Candidate.name,
+            Candidate.email,
+            Candidate.phone,
+            Candidate.experience,
+            Candidate.status,
+            Job.title.label("job_title")
+        )
+        .outerjoin(Job, Candidate.job_match_id == Job.id)
+        .all()
+    )
+    return [
+        {
+            "id": r.id,
+            "name": r.name,
+            "email": r.email,
+            "phone": r.phone,
+            "experience": r.experience,
+            "status": r.status,
+            "job": r.job_title or "N/A"
+        }
+        for r in rows
+    ]
+
+
+@router.delete("/candidates/{candidate_id}")
+def admin_delete_candidate(
+    candidate_id: str,
+    current_admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    old_status = candidate.status or "Applied"
+    candidate.status = "Deleted"
+    candidate.status_updated_at = datetime.utcnow()
+
+    history = CandidateStatusHistory(
+        candidate_id=candidate.id,
+        old_status=old_status,
+        new_status="Deleted",
+        changed_by="Admin"
+    )
+    db.add(history)
+    db.commit()
+
+    return {"message": "Candidate deleted successfully"}
+
+
+@router.post("/candidates/{candidate_id}/restore")
+def admin_restore_candidate(
+    candidate_id: str,
+    current_admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    old_status = candidate.status or "Deleted"
+    candidate.status = "Applied"
+    candidate.status_updated_at = datetime.utcnow()
+
+    history = CandidateStatusHistory(
+        candidate_id=candidate.id,
+        old_status=old_status,
+        new_status="Applied",
+        changed_by="Admin"
+    )
+    db.add(history)
+    db.commit()
+
+    return {"message": "Candidate restored successfully"}

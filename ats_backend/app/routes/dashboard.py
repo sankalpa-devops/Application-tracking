@@ -280,7 +280,7 @@ def get_hr_dashboard(
         .first()
     )
 
-    if skill_gap and skill_gap.avg_skill < 50:
+    if skill_gap and skill_gap.avg_skill is not None and skill_gap.avg_skill < 50:
         job = db.query(Job).filter(Job.id == skill_gap.job_id).first()
         if job:
             insights.append(

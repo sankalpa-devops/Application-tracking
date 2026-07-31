@@ -266,7 +266,7 @@ def get_resume_screening_candidates(
 
         if c.resume_path:
             filename = os.path.basename(c.resume_path)
-            resume_url = f"{os.getenv('REACT_APP_API_URL_BASE')}/resumes/{filename}"
+            resume_url = f"/resumes/{filename}"
 
         results.append({
             "id": c.id,

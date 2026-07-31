@@ -5,3 +5,7 @@ my-app/
 env.txt 
 ats_backend/.env 
 .env 
+uploads/
+.env
+__pycache__/
+*.pyc

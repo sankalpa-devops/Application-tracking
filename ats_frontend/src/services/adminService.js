@@ -40,3 +40,24 @@ export const getAdminActivity = async () => {
   });
   return response.data;
 };
+
+export const getAdminCandidates = async () => {
+  const response = await axios.get(`${API}/admin/candidates`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+export const deleteAdminCandidate = async (candidateId) => {
+  const response = await axios.delete(`${API}/admin/candidates/${candidateId}`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+export const restoreAdminCandidate = async (candidateId) => {
+  const response = await axios.post(`${API}/admin/candidates/${candidateId}/restore`, {}, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};

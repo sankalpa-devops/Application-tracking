@@ -32,6 +32,20 @@ const Admin = ({ currentUser, onLogout }) => {
   const [activity, setActivity] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [hrServiceEnabled, setHrServiceEnabled] = useState(true);
+  const [blockedFeatures, setBlockedFeatures] = useState({
+    "Job Management": false,
+    "Job Links": false,
+    "Candidates": false,
+    "Resume Screening": false,
+    "Walk-ins": false,
+    "Interviews": false,
+    "Joining Forms": false,
+    "Blacklist": false,
+    "Analytics": false,
+    "Transfer Requests": false
+  });
+  const [retentionMonths, setRetentionMonths] = useState(3);
 
   const [formData, setFormData] = useState({
     emp_id: "",
@@ -75,8 +89,101 @@ const Admin = ({ currentUser, onLogout }) => {
     }
   };
 
+  const fetchHrServiceStatus = async () => {
+    try {
+      const res = await axios.get(`${API}/ats-config/global/hr-service`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      if (res.data && res.data.hr_service_enabled !== undefined) {
+        setHrServiceEnabled(res.data.hr_service_enabled);
+      }
+    } catch (err) {
+      console.error("Error fetching HR service status:", err);
+    }
+  };
+
+  const fetchBlockedFeatures = async () => {
+    try {
+      const res = await axios.get(`${API}/ats-config/global/blocked-features`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      if (res.data) {
+        setBlockedFeatures(res.data);
+      }
+    } catch (err) {
+      console.error("Error fetching blocked features:", err);
+    }
+  };
+
+  const fetchRetentionConfig = async () => {
+    try {
+      const res = await axios.get(`${API}/ats-config/global/retention`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      if (res.data && res.data.retention_months !== undefined) {
+        setRetentionMonths(res.data.retention_months);
+      }
+    } catch (err) {
+      console.error("Error fetching retention configuration:", err);
+    }
+  };
+
+  const toggleHrService = async () => {
+    const nextState = !hrServiceEnabled;
+    try {
+      await axios.post(`${API}/ats-config/global/hr-service`, {
+        hr_service_enabled: nextState
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      setHrServiceEnabled(nextState);
+      setMessage(`HR Portal service has been ${nextState ? "enabled" : "disabled"} successfully.`);
+    } catch (err) {
+      console.error("Error toggling HR service:", err);
+      alert("Failed to update HR service status.");
+    }
+  };
+
+  const handleFeatureToggle = async (featureName) => {
+    const nextState = !blockedFeatures[featureName];
+    const updated = { ...blockedFeatures, [featureName]: nextState };
+    setBlockedFeatures(updated);
+
+    try {
+      await axios.post(`${API}/ats-config/global/blocked-features`, {
+        [featureName]: nextState
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      setMessage(`HR portal feature "${featureName}" has been ${nextState ? "blocked" : "unblocked"} successfully.`);
+    } catch (err) {
+      console.error("Error toggling feature:", err);
+      alert("Failed to update feature control status.");
+      setBlockedFeatures({ ...blockedFeatures, [featureName]: !nextState });
+    }
+  };
+
+  const handleRetentionChange = async (newVal) => {
+    if (newVal < 1) return;
+    setRetentionMonths(newVal);
+    try {
+      await axios.post(`${API}/ats-config/global/retention`, {
+        retention_months: newVal
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      setMessage(`Candidate retention period updated to ${newVal} months.`);
+    } catch (err) {
+      console.error("Error updating retention period:", err);
+      alert("Failed to update retention configuration.");
+    }
+  };
+
   useEffect(() => {
     loadAdminData();
+    fetchHrServiceStatus();
+    fetchBlockedFeatures();
+    fetchRetentionConfig();
   }, []);
 
   const handleChange = (e) => {
@@ -334,21 +441,102 @@ const Admin = ({ currentUser, onLogout }) => {
 
   const renderSettings = () => (
     <div style={styles.twoColumn}>
-      <section style={styles.panel}>
-        <h2 style={styles.title}>Admin Settings</h2>
-        <div style={styles.settingRow}>
-          <span>Default new user password</span>
-          <strong>{DEFAULT_PASSWORD}</strong>
-        </div>
-        <div style={styles.settingRow}>
-          <span>Admin accounts</span>
-          <strong>{dashboard.metrics.admin_users || 0}</strong>
-        </div>
-        <div style={styles.settingRow}>
-          <span>HR accounts</span>
-          <strong>{dashboard.metrics.hr_users || 0}</strong>
-        </div>
-      </section>
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <section style={styles.panel}>
+          <h2 style={styles.title}>Admin Settings</h2>
+          <div style={styles.settingRow}>
+            <span>Default new user password</span>
+            <strong>{DEFAULT_PASSWORD}</strong>
+          </div>
+          <div style={styles.settingRow}>
+            <span>Admin accounts</span>
+            <strong>{dashboard.metrics.admin_users || 0}</strong>
+          </div>
+          <div style={styles.settingRow}>
+            <span>HR accounts</span>
+            <strong>{dashboard.metrics.hr_users || 0}</strong>
+          </div>
+        </section>
+
+        <section style={styles.panel}>
+          <h2 style={styles.title}>Service Control</h2>
+          <p style={styles.subtitle}>Enable or disable access to the HR portal for all HR users.</p>
+          <div style={{ marginTop: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+            <div>
+              <strong style={{ display: "block" }}>HR Portal Service</strong>
+              <span style={{ color: "#6b7280", fontSize: "13px" }}>
+                {hrServiceEnabled ? "Service is active" : "Service is suspended"}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <button
+                className={`btn ${hrServiceEnabled ? "btn-danger" : "btn-success"}`}
+                onClick={toggleHrService}
+                style={{ padding: "6px 12px", fontSize: "14px", fontWeight: "bold" }}
+              >
+                {hrServiceEnabled ? "Stop Service" : "Start Service"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section style={styles.panel}>
+          <h2 style={styles.title}>Candidate Data Retention</h2>
+          <p style={styles.subtitle}>Specify the number of months rejected candidate data remains in the database before deletion.</p>
+          <div style={{ marginTop: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+            <div>
+              <strong style={{ display: "block" }}>Retention Period</strong>
+              <span style={{ color: "#6b7280", fontSize: "13px" }}>
+                Profiles and resumes deleted after {retentionMonths} month{retentionMonths > 1 ? "s" : ""}.
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => handleRetentionChange(retentionMonths - 1)}
+                disabled={retentionMonths <= 1}
+                style={{ width: "36px", height: "36px", padding: 0, fontSize: "18px", fontWeight: "bold" }}
+              >
+                -
+              </button>
+              <strong style={{ fontSize: "16px", minWidth: "24px", textAlign: "center" }}>{retentionMonths}</strong>
+              <button
+                className="btn btn-secondary"
+                onClick={() => handleRetentionChange(retentionMonths + 1)}
+                style={{ width: "36px", height: "36px", padding: 0, fontSize: "18px", fontWeight: "bold" }}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section style={styles.panel}>
+          <h2 style={styles.title}>Feature Control Panel</h2>
+          <p style={styles.subtitle}>Block or unblock specific HR portal features dynamically.</p>
+          <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            {Object.keys(blockedFeatures).map((feature) => (
+              <div key={feature} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "#f9fafb", borderRadius: "6px", border: "1px solid #e5e7eb" }}>
+                <span style={{ fontWeight: "500", fontSize: "14px" }}>{feature}</span>
+                <button
+                  onClick={() => handleFeatureToggle(feature)}
+                  className={`btn ${blockedFeatures[feature] ? "btn-danger" : "btn-success"}`}
+                  style={{
+                    padding: "4px 12px",
+                    borderRadius: "4px",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  {blockedFeatures[feature] ? "Blocked" : "Active"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
 
       <section style={styles.panel}>
         <h2 style={styles.title}>Recent Activity</h2>

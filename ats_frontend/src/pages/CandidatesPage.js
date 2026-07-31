@@ -6,7 +6,7 @@ import CandidateTable from "../components/CandidateTable";
 
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
 
-const CandidatesPage = () => {
+const CandidatesPage = ({ hrServiceEnabled }) => {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
 
@@ -68,6 +68,7 @@ const CandidatesPage = () => {
         candidate={selectedCandidate}
         onClose={() => setSelectedCandidate(null)}
         refreshData={fetchCandidates}
+        hrServiceEnabled={hrServiceEnabled}
       />
     </div>
   );

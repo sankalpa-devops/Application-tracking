@@ -2,7 +2,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import APP_CONFIG from "../config/appConfig";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
+const API_BASE = APP_CONFIG.API_BASE_URL;
 
 const JobLinkManager = () => {
   const [jobs, setJobs] = useState([]);

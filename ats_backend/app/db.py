@@ -58,7 +58,15 @@ else:
 # =========================
 # ENGINE + SESSION
 # =========================
-engine = create_engine(DB_URL)
+connect_args = {}
+if DB_TYPE == "mysql" and DB_HOST and "aivencloud.com" in DB_HOST:
+    import ssl
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    connect_args["ssl"] = ctx
+
+engine = create_engine(DB_URL, connect_args=connect_args)
 
 SessionLocal = sessionmaker(
     autocommit=False,

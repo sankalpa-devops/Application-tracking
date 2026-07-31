@@ -103,6 +103,8 @@ import Login from "./pages/Login";
 import PublicJobApply from "./pages/PublicJobApply";
 import PublicTransferRequest from "./pages/PublicTransferRequest";
 import ResetPassword from "./pages/ResetPassword";
+import PublicJoiningForm from "./pages/PublicJoiningForm";
+
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -168,6 +170,7 @@ function App() {
 
   <Route path="/apply/:slug" element={<PublicJobApply />} />
   <Route path="/transfer-request/:slug" element={<PublicTransferRequest />} />
+  <Route path="/joining-form/:slug" element={<PublicJoiningForm />} />
   <Route path="*" element={<Navigate to="/" replace />} />
 
 </Routes>
